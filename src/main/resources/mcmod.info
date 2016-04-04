@@ -1,0 +1,18 @@
+[
+{
+  "modid": "mcquota",
+  "name": "MCQuota",
+  "description": "Limit the time players spend on your server.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://github.com/adamk33n3r/mcquota",
+  "updateUrl": "",
+  "authorList": ["adamk33n3r"],
+  "credits": "Created by adamk33n3r",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": [
+    "mod_MinecraftForge"
+  ]
+}
+]
