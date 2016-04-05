@@ -1,5 +1,6 @@
 package com.adam_keenan.mcmods.mcquota;
 
+import com.adam_keenan.mcmods.mcquota.utils.Log;
 import cpw.mods.fml.common.FMLLog;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommand;
@@ -33,7 +34,7 @@ public class CommandQuota extends CommandBase implements ICommand {
 
     @Override
     public String getCommandUsage(ICommandSender iCommandSender) {
-        return "mcquota <player> <time>";
+        return "/mcquota <player> <time>";
     }
 
     @Override
@@ -47,11 +48,11 @@ public class CommandQuota extends CommandBase implements ICommand {
             System.out.println("Player sent command");
         }
         iCommandSender.addChatMessage(new ChatComponentText("hello world"));
+        Log.info("Command received! Args: " + StringUtils.join(strings, ", "));
         if (strings.length == 0) {
             System.out.println("Invalid command!");
             return;
         }
-        FMLLog.info("Command received! Args: " + StringUtils.join(strings, ", "));
     }
 
     @Override
@@ -62,17 +63,17 @@ public class CommandQuota extends CommandBase implements ICommand {
 
     @Override
     public List addTabCompletionOptions(ICommandSender iCommandSender, String[] strings) {
-        FMLLog.info("%s", StringUtils.join(strings, ", "));
+        Log.info((Object[])strings);
         switch (strings.length) {
             case 1:
                 return CommandBase.getListOfStringsMatchingLastWord(strings, this.subcommands);
             case 2:
                 if (strings[0].equals("player")) {
-                    FMLLog.info("player sub");
+                    Log.info("player sub");
                     return CommandBase.getListOfStringsMatchingLastWord(strings, MinecraftServer.getServer().getAllUsernames());
                 } else {
-                    FMLLog.info("not player");
-                    FMLLog.info(":%s:", strings[0]);
+                    Log.info("not player");
+                    Log.info(":%s:", strings[0]);
                 }
                 break;
         }
