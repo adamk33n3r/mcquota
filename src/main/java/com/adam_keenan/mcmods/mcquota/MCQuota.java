@@ -1,5 +1,6 @@
 package com.adam_keenan.mcmods.mcquota;
 
+import com.adam_keenan.mcmods.mcquota.quota.QuotaManager;
 import com.adam_keenan.mcmods.mcquota.utils.ConfigurationManager;
 import com.adam_keenan.mcmods.mcquota.utils.Log;
 import cpw.mods.fml.common.Mod;
@@ -24,6 +25,7 @@ public class MCQuota
         MinecraftForge.EVENT_BUS.register(new EventHooks());
         Configuration config = new Configuration(event.getSuggestedConfigurationFile());
         this.configManager = new ConfigurationManager(config);
+        //QuotaManager qm = new QuotaManager();
     }
 
     @EventHandler
