@@ -13,7 +13,6 @@ import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 public class EventHooks {
     @SubscribeEvent
     public void entityJoined(EntityJoinWorldEvent event) {
-        FMLNetworkEvent.ClientConnectedToServerEvent
         // Probably unnecessary but better safe than sorry.
         if (event.entity instanceof EntityPlayerMP) {
             Log.info("Player connected: " + ((EntityPlayerMP) event.entity).getDisplayName());

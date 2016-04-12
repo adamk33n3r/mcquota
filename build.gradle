@@ -46,6 +46,7 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
     compile 'org.xerial:sqlite-jdbc:3.8.11.2'
+    compile 'junit:junit:4.12'
 }
 
 processResources
@@ -68,6 +69,14 @@ processResources
     }
 }
 
+//sourceSets {
+//    test {
+//        java {
+//            exclude 'com/adam_keenan/mcmods/mcquota/test/**'
+//        }
+//    }
+//}
+
 jar {
     configurations.shade.each { dep ->
         from(project.zipTree(dep)) {
@@ -77,7 +86,7 @@ jar {
 }
 
 task deobfJar(type: Jar, dependsOn: 'jar') {
-    from "build/source/main"
+    from "build/classes/main"
     classifier "dev"
 }
 artifacts {
@@ -86,7 +95,7 @@ artifacts {
 
 task sourceJar(type: Jar, dependsOn: 'sourceMainJava') {
     from "build/sources/java"
-    from "build/resources/main/java"
+    from "build/resources/main"
     classifier "sources"
 }
 artifacts {
