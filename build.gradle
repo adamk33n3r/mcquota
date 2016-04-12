@@ -24,6 +24,12 @@ archivesBaseName = "mcquota"
 minecraft {
     version = "1.7.10-10.13.4.1558-1.7.10"
     runDir = "eclipse"
+    srgExtra "PK: org.xerial com.adam_keenan.mcmods.mcquota.shaded.xerial"
+}
+
+configurations {
+    shade
+    compile.extendsFrom shade
 }
 
 dependencies {
@@ -60,4 +66,29 @@ processResources
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info'
     }
+}
+
+jar {
+    configurations.shade.each { dep ->
+        from(project.zipTree(dep)) {
+            exclude 'META-INF', 'META-INF/**'
+        }
+    }
+}
+
+task deobfJar(type: Jar, dependsOn: 'jar') {
+    from "build/source/main"
+    classifier "dev"
+}
+artifacts {
+    archives deobfJar
+}
+
+task sourceJar(type: Jar, dependsOn: 'sourceMainJava') {
+    from "build/sources/java"
+    from "build/resources/main/java"
+    classifier "sources"
+}
+artifacts {
+    archives sourceJar
 }
