@@ -20,9 +20,16 @@ public class MCQuota
     public void preInit(FMLPreInitializationEvent event)
     {
         Log.info("preInit");
+        try {
+            Class.forName("org.h2.Driver");
+        } catch (ClassNotFoundException e) {
+            Log.severe(e.getClass().getName() + ": " + e.getMessage());
+            FMLCommonHandler.instance().exitJava(-1, true);
+        }
         MinecraftForge.EVENT_BUS.register(new EventHooks());
         FMLCommonHandler.instance().bus().register(new EventHooks());
         Config.load(event);
+        Log.info(String.format("Global quota length is %s", Config.quotaLength));
     }
 
     @EventHandler

@@ -24,7 +24,7 @@ archivesBaseName = "mcquota"
 minecraft {
     version = "1.7.10-10.13.4.1558-1.7.10"
     runDir = "eclipse"
-    srgExtra "PK: org.xerial com.adam_keenan.mcmods.mcquota.shaded.xerial"
+    srgExtra "PK: org.h2 com.adam_keenan.mcmods.mcquota.shaded.h2"
 }
 
 configurations {

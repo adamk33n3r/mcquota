@@ -13,18 +13,17 @@ public class Config {
     public static void load(FMLPreInitializationEvent event) {
         config = new Configuration(event.getSuggestedConfigurationFile(), "0.1");
         config.load();
-        Log.info(ForgeModContainer.getConfig().getConfigFile().getName());
 
         quotaLength = config.getInt(
             "quotaLength",
             "global",
             /* 24 hours */
-            24*60,
-            /* 1 hour */
-            1*60,
+            24*60*60,
+            /* 1 minute */
+            60,
             /* 24 hours */
-            24*60,
-            "Set the default quota length for all users.");
+            24*60*60,
+            "The default quota length for all users in seconds.");
 
         if (config.hasChanged()) {
             config.save();

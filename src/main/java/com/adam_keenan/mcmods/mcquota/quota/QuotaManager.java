@@ -100,14 +100,14 @@ public class QuotaManager {
             ResultSet result = statement.executeQuery(sql);
             result.next();
             int difference = result.getInt(1);
-            Log.info(difference);
+            Log.info("Time to be added", difference);
             statement.close();
 
             sql = QueryBuilder
                 .table("timelogs")
                 .select("count(*)")
                 .where("players_uuid", "=", uuid)
-                .where("date", "=", "today()")
+                .where("date", "=", "today()", true)
                 .getSql()
             ;
             statement = this.connection.createStatement();
@@ -122,7 +122,7 @@ public class QuotaManager {
                 pstatement.setInt(2, difference);
                 pstatement.executeUpdate();
             } else {
-                sql = "update timelogs set time_spent = time_spent + ?1 where uuid = ?2 and date = today();";
+                sql = "update timelogs set time_spent = time_spent + ?1 where players_uuid = ?2 and date = today();";
                 PreparedStatement pstatement = this.connection.prepareStatement(sql);
                 pstatement.setInt(1, difference);
                 pstatement.setString(2, uuid);
