@@ -3,6 +3,7 @@ package com.adam_keenan.mcmods.mcquota.utils;
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 
+import javax.management.Query;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +12,7 @@ public class QueryBuilder {
     private String table;
     private List<String> selects;
     private List<String> wheres;
+    private List<String> joins;
 
 
     public static QueryBuilder table(String tableName) {
@@ -31,15 +33,26 @@ public class QueryBuilder {
     }
 
     public QueryBuilder where(String column, String cmp, Object value) {
+        return this.where(column, cmp, value, false);
+    }
+
+    public QueryBuilder where(String column, String cmp, Object value, Boolean raw) {
         if (this.wheres == null) {
             this.wheres = new ArrayList<String>();
         }
-        this.wheres.add(String.format("\"%s\" %s %s", column, cmp, value));
+        if (!raw && !(value instanceof Number || value instanceof Boolean)) {
+            value = String.format("'%s'", value);
+        }
+        this.wheres.add(String.format("%s %s %s", column, cmp, value));
         return this;
     }
 
-    public QueryBuilder where(String column, String cmp, String value) {
-        return this.where(column, cmp, (Object)String.format("'%s'", value));
+    public QueryBuilder join(String table, String column1, String cmp, String column2) {
+        if (this.joins == null) {
+            this.joins = new ArrayList<String>();
+        }
+        this.joins.add(String.format("inner join %s on %s %s %s", table, column1, cmp, column2));
+        return this;
     }
 
     private String buildQuery() {
@@ -52,6 +65,9 @@ public class QueryBuilder {
         }
         query.append(" from ");
         query.append(this.table);
+        if (this.joins != null) {
+            query.append(" " + StringUtils.join(this.joins, " "));
+        }
         if (this.wheres != null) {
             query.append(" where ");
             query.append(StringUtils.join(this.wheres, " and "));

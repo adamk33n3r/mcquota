@@ -21,18 +21,34 @@ public class QueryBuilderTest {
     }
 
     @Test
+    public void join() throws Exception {
+        String query = QueryBuilder
+            .table("table")
+            .join("other_table", "id", "=", "table.other_table_id")
+            .getSql();
+        assertEquals(query, "select * from table inner join other_table on id = table.other_table_id;");
+        query = QueryBuilder
+            .table("table")
+            .join("other_table", "id", "=", "table.other_table_id")
+            .where("thing", "=", 5)
+            .where("other_thing", ">=", 4)
+            .getSql();
+        assertEquals(query, "select * from table inner join other_table on id = table.other_table_id where thing = 5 and other_thing >= 4;");
+    }
+
+    @Test
     public void where() throws Exception {
         String query = QueryBuilder
             .table("table")
             .where("username", "ilike", "adamk33n3r")
             .getSql();
-        assertEquals(query, "select * from table where \"username\" ilike 'adamk33n3r';");
+        assertEquals(query, "select * from table where username ilike 'adamk33n3r';");
         query = QueryBuilder
             .table("table")
             .where("age", ">=", 21)
             .where("age", "<=", 25)
             .getSql();
-        assertEquals(query, "select * from table where \"age\" >= 21 and \"age\" <= 25;");
+        assertEquals(query, "select * from table where age >= 21 and age <= 25;");
     }
 
     @Test

@@ -39,7 +39,7 @@ dependencies {
     // for more info...
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
-    compile 'org.xerial:sqlite-jdbc:3.8.11.2'
+    compile 'com.h2database:h2:1.4.191'
 }
 
 processResources
