@@ -23,15 +23,6 @@ public class MCQuota
     {
         Log.info("preInit");
 
-//        File dbFile = new File("test.mv.db");
-//        if (dbFile.exists()) {
-//            dbFile.delete();
-//        }
-//        dbFile = new File("test.trace.db");
-//        if (dbFile.exists()) {
-//            dbFile.delete();
-//        }
-
         try {
             Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException e) {

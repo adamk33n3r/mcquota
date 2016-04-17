@@ -37,7 +37,6 @@ public class QuotaDBManager {
     }
 
     public Timelog getTimelog(String uuid) {
-        Log.info("getting logs");
         try {
             Statement statement = this.connection.createStatement();
             statement.executeQuery(
@@ -59,9 +58,6 @@ public class QuotaDBManager {
             timelog.players_uuid = result.getString("players_uuid");
             timelog.date = result.getDate("date");
             timelog.time_spent = result.getInt("time_spent");
-            for (int i = 1; i <= colCount; i++) {
-                Log.info(result.getMetaData().getColumnName(i), result.getObject(i));
-            }
             statement.close();
             return timelog;
         } catch (SQLException e) {
@@ -131,6 +127,19 @@ public class QuotaDBManager {
         return 0;
     }
 
+    public void setTimeSpent(String uuid, int timeSpent) {
+        try {
+            String sql = "merge into timelogs (players_uuid, time_spent, date) key (players_uuid, date) values (?1, ?2, today())";
+            PreparedStatement pstatement = this.connection.prepareStatement(sql);
+            pstatement.setString(1, uuid);
+            pstatement.setInt(2, timeSpent);
+            pstatement.executeUpdate();
+            pstatement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void close() {
         Log.info("closing connection");
         try {
@@ -184,14 +193,15 @@ public class QuotaDBManager {
                 pstatement.setString(1, uuid);
                 pstatement.setInt(2, difference);
                 pstatement.executeUpdate();
+                pstatement.close();
             } else {
                 sql = "update timelogs set time_spent = time_spent + ?1 where players_uuid = ?2 and date = today();";
                 PreparedStatement pstatement = this.connection.prepareStatement(sql);
                 pstatement.setInt(1, difference);
                 pstatement.setString(2, uuid);
                 pstatement.executeUpdate();
+                pstatement.close();
             }
-            statement.close();
 
         } catch (SQLException e) {
             e.printStackTrace();

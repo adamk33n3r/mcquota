@@ -1,7 +1,6 @@
 package com.adam_keenan.mcmods.mcquota;
 
 import com.adam_keenan.mcmods.mcquota.quota.QuotaDBManager;
-import com.adam_keenan.mcmods.mcquota.quota.QuotaManager;
 import com.adam_keenan.mcmods.mcquota.utils.Config;
 import com.adam_keenan.mcmods.mcquota.utils.Log;
 import com.adam_keenan.mcmods.mcquota.utils.Utils;
@@ -11,9 +10,7 @@ import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.management.ServerConfigurationManager;
 import net.minecraft.util.ChatComponentText;
 import net.minecraftforge.common.UsernameCache;
 import org.apache.commons.lang3.StringUtils;
@@ -53,62 +50,81 @@ public class CommandQuota extends CommandBase implements ICommand {
     }
 
     @Override
-    public void processCommand(ICommandSender iCommandSender, String[] strings) {
+    public void processCommand(ICommandSender iCommandSender, String[] args) {
         if (iCommandSender instanceof EntityPlayer) {
             Log.info("Player sent command");
         } else {
             Log.info("not player");
         }
-        Log.info("Command received! Args: " + StringUtils.join(strings, ", "));
-        if (strings.length == 0) {
+        Log.info("Command received! Args: " + StringUtils.join(args, ", "));
+        if (args.length == 0) {
             iCommandSender.addChatMessage(new ChatComponentText("Usage: /mcquota <global | player <player>> [quota]"));
         } else {
-            if (strings[0].equals("player")) {
-                Log.info("player sub");
-                if (strings.length == 2) {
-                    EntityPlayerMP player;
-                    String uuid = null;
-                    try {
-                        uuid = Utils.playerToUUID(CommandBase.getPlayer(iCommandSender, strings[1]));
-                    } catch (PlayerNotFoundException e) {
-                        Log.info("Player not found. Looking in cache");
-                        Map<UUID, String> userMap = UsernameCache.getMap();
-                        for (Map.Entry<UUID, String> entry : userMap.entrySet()) {
-                            if (entry.getValue().equals(strings[1])) {
-                                uuid = entry.getKey().toString();
-                                Log.info("Found in cache");
-                                break;
+            try {
+                if (args[0].equals("player")) {
+                    Log.info("player sub");
+                    if (args.length > 1) {
+                        String uuid = null;
+                        try {
+                            uuid = Utils.playerToUUID(CommandBase.getPlayer(iCommandSender, args[1]));
+                        } catch (PlayerNotFoundException e) {
+                            Log.info("Player not found. Looking in cache");
+                            Map<UUID, String> userMap = UsernameCache.getMap();
+                            for (Map.Entry<UUID, String> entry : userMap.entrySet()) {
+                                if (entry.getValue().equals(args[1])) {
+                                    uuid = entry.getKey().toString();
+                                    Log.info("Found in cache");
+                                    break;
+                                }
+                            }
+                            if (uuid == null) {
+                                throw e;
                             }
                         }
-                        if (uuid == null) {
-                            throw e;
+                        if (args.length == 2) {
+                            int quota = QuotaDBManager.getInstance().getPlayerQuota(uuid);
+                            int timePlayed = QuotaDBManager.getInstance().getTimeSpent(uuid);
+                            iCommandSender.addChatMessage(new ChatComponentText(String.format("Quota is set to %d", quota)));
+                            iCommandSender.addChatMessage(new ChatComponentText(String.format("Time played today is %d", timePlayed)));
+                        } else if (args.length == 3) {
+                            iCommandSender.addChatMessage(new ChatComponentText("/mcquota player <player> quota|time <number>"));
+                        } else if (args.length == 4) {
+                            if (args[2].equals("quota")) {
+                                if (args[3].equals("off")) {
+                                    iCommandSender.addChatMessage(new ChatComponentText("Quota turned off"));
+                                    QuotaDBManager.getInstance().setPlayerQuota(uuid, -1);
+                                } else {
+                                    int quota = Integer.parseInt(args[3]);
+                                    QuotaDBManager.getInstance().setPlayerQuota(uuid, quota);
+                                    iCommandSender.addChatMessage(new ChatComponentText(String.format("Quota set to %d", quota)));
+                                }
+                            } else if (args[2].equals("time")) {
+                                QuotaDBManager.getInstance().setTimeSpent(uuid, Integer.parseInt(args[3]));
+                            }
                         }
                     }
-                    int quota = QuotaDBManager.getInstance().getPlayerQuota(uuid);
-                    int timePlayed = QuotaDBManager.getInstance().getTimeSpent(uuid);
-                    iCommandSender.addChatMessage(new ChatComponentText(String.format("Quota is set to %d", quota)));
-                    iCommandSender.addChatMessage(new ChatComponentText(String.format("Time played today is %d", timePlayed)));
-                } else if (strings.length == 3) {
-                    EntityPlayerMP player = CommandBase.getPlayer(iCommandSender, strings[1]);
-                    if (strings[2].equals("off")) {
-                        iCommandSender.addChatMessage(new ChatComponentText("Quota turned off"));
-                        QuotaDBManager.getInstance().setPlayerQuota(Utils.playerToUUID(player), -1);
+                } else if (args[0].equals("global")) {
+                    if (args.length >= 2) {
+                        if (args[1].equals("off")) {
+                            Config.globalEnabled.set(false);
+                            iCommandSender.addChatMessage(new ChatComponentText(String.format("Global check set to " + Config.globalEnabled.getBoolean())));
+                        } else if (args[1].equals("on")) {
+                            Config.globalEnabled.set(true);
+                            iCommandSender.addChatMessage(new ChatComponentText(String.format("Global check set to " + Config.globalEnabled.getBoolean())));
+                        } else {
+                            Config.quotaLength.set(Integer.parseInt(args[1]));
+                            iCommandSender.addChatMessage(new ChatComponentText(String.format("Global quota set to " + Config.quotaLength.getInt())));
+                        }
+                        Config.save();
                     } else {
-                        int quota = Integer.parseInt(strings[2]);
-                        QuotaDBManager.getInstance().setPlayerQuota(Utils.playerToUUID(player), quota);
-                        iCommandSender.addChatMessage(new ChatComponentText(String.format("Quota set to %d", quota)));
+                        iCommandSender.addChatMessage(new ChatComponentText(String.format("Global check set to " + Config.globalEnabled.getBoolean())));
+                        iCommandSender.addChatMessage(new ChatComponentText(String.format("Global quota is set to " + Config.quotaLength.getInt())));
                     }
-                }
-            } else if (strings[0].equals("global")) {
-                if (strings.length >= 2) {
-                    Config.quotaLength = Integer.parseInt(strings[1]);
-                    iCommandSender.addChatMessage(new ChatComponentText(String.format("Global quota set to " + Config.quotaLength)));
-                    Config.save();
                 } else {
-                    iCommandSender.addChatMessage(new ChatComponentText(String.format("Global quota is set to " + Config.quotaLength)));
+                    iCommandSender.addChatMessage(new ChatComponentText("Unknown command"));
                 }
-            } else {
-                iCommandSender.addChatMessage(new ChatComponentText("Unknown command"));
+            } catch (NumberFormatException e) {
+                iCommandSender.addChatMessage(new ChatComponentText("Could not parse number."));
             }
         }
     }
@@ -140,7 +156,7 @@ public class CommandQuota extends CommandBase implements ICommand {
 
     @Override
     public boolean isUsernameIndex(String[] strings, int i) {
-        FMLLog.info("%s|%s|%s", StringUtils.join(strings, ", "), strings[i], i);
+        Log.info("%s|%s|%s", StringUtils.join(strings, ", "), strings[i], i);
         return strings[0].equals("player") && i == 1;
     }
 }

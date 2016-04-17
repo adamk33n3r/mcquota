@@ -6,10 +6,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.Logger;
 
-
 public class Log {
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     public static void log(Level level, String format, Object... objects) {
         if (FMLLog.getLogger() != null) {

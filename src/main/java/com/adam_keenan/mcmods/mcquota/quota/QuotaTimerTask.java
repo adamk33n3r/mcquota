@@ -1,19 +1,25 @@
 package com.adam_keenan.mcmods.mcquota.quota;
 
-import net.minecraft.entity.player.EntityPlayer;
+import com.adam_keenan.mcmods.mcquota.utils.Log;
+import cpw.mods.fml.common.ModClassLoader;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ChatComponentText;
 
 import java.util.TimerTask;
 
 public class QuotaTimerTask extends TimerTask {
-    EntityPlayer player;
-
-    public QuotaTimerTask(EntityPlayer player) {
-        this.player = player;
-    }
+    public QuotaTimerTask() {}
 
     @Override
     public void run() {
-        QuotaManager.getInstance().save(this.player);
-        QuotaManager.getInstance().kickIfOverQuota(this.player);
+        for (Object obj : MinecraftServer.getServer().getConfigurationManager().playerEntityList) {
+            EntityPlayerMP player = (EntityPlayerMP)obj;
+            Log.info(String.format("Checking logs for %s", player.getDisplayName()));
+            QuotaManager.getInstance().save(player);
+            QuotaManager.getInstance().kickIfOverQuota(player);
+            Timelog timelog = QuotaManager.getInstance().getTimelog(player);
+            player.addChatMessage(new ChatComponentText(String.format("You have %d seconds left for today!", timelog.time_spent)));
+        }
     }
 }
