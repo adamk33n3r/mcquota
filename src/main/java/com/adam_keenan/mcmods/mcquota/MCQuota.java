@@ -11,6 +11,8 @@ import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 import cpw.mods.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.common.MinecraftForge;
 
+import java.io.File;
+
 @Mod(modid = Info.MODID, name = Info.NAME , version = Info.VERSION, acceptableRemoteVersions = "*")
 public class MCQuota
 {
@@ -20,6 +22,16 @@ public class MCQuota
     public void preInit(FMLPreInitializationEvent event)
     {
         Log.info("preInit");
+
+//        File dbFile = new File("test.mv.db");
+//        if (dbFile.exists()) {
+//            dbFile.delete();
+//        }
+//        dbFile = new File("test.trace.db");
+//        if (dbFile.exists()) {
+//            dbFile.delete();
+//        }
+
         try {
             Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException e) {
