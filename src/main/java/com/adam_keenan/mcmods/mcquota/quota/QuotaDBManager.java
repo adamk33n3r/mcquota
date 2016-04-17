@@ -19,7 +19,7 @@ public class QuotaDBManager {
         }
 
         try {
-            this.connection = DriverManager.getConnection("jdbc:h2:./test");
+            this.connection = DriverManager.getConnection("jdbc:h2:./mcquota");
             Log.info("Opened database successfully");
             if (!QuotaDBManager.initialized) {
                 this.initDB();
@@ -127,6 +127,11 @@ public class QuotaDBManager {
         return 0;
     }
 
+    /**
+     * @TODO Make sure the player actually exists
+     * @param uuid
+     * @param timeSpent
+     */
     public void setTimeSpent(String uuid, int timeSpent) {
         try {
             String sql = "merge into timelogs (players_uuid, time_spent, date) key (players_uuid, date) values (?1, ?2, today())";
@@ -216,8 +221,8 @@ public class QuotaDBManager {
             String sql = "create table if not exists players " +
                 "(" +
                 "uuid       varchar(36) primary key," +
-                "last_login timestamp default now()," +
-                "quota      int" +
+                "last_login timestamp   default now()," +
+                "quota      int         default -1" +
                 ")";
             statement.executeUpdate(sql);
             sql = "create table if not exists timelogs " +
