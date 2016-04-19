@@ -28,14 +28,14 @@ public class QuotaDBManagerTest {
 
     @Test
     public void testManager() throws Exception {
-        this.manager = QuotaDBManager.getInstance();
+        this.manager = QuotaDBManager.getInstance("test");
 
         String uuid = "b63fa9df-dbd7-4f8b-9bdb-eaa486781115";
         this.manager.updateLoginTime(uuid);
         this.manager.close();
 
         Thread.sleep(3200);
-        this.manager = QuotaDBManager.getInstance();
+        this.manager = QuotaDBManager.getInstance("test");
         this.manager.updateTimeSpent(uuid);
         Timelog timelog = this.manager.getTimelog(uuid);
         Log.info(timelog);

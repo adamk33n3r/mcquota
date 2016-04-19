@@ -10,7 +10,7 @@ public class QuotaDBManager {
     private Connection connection;
     private static boolean initialized = false;
 
-    private QuotaDBManager() {
+    private QuotaDBManager(String dbName) {
         try {
             Class.forName("org.h2.Driver");
         } catch (ClassNotFoundException e) {
@@ -19,7 +19,7 @@ public class QuotaDBManager {
         }
 
         try {
-            this.connection = DriverManager.getConnection("jdbc:h2:./mcquota");
+            this.connection = DriverManager.getConnection("jdbc:h2:./" + dbName);
             Log.info("Opened database successfully");
             if (!QuotaDBManager.initialized) {
                 this.initDB();
@@ -33,7 +33,11 @@ public class QuotaDBManager {
     }
 
     public static QuotaDBManager getInstance() {
-        return new QuotaDBManager();
+        return new QuotaDBManager("mcquota");
+    }
+
+    public static QuotaDBManager getInstance(String dbName) {
+        return new QuotaDBManager(dbName);
     }
 
     public Timelog getTimelog(String uuid) {
